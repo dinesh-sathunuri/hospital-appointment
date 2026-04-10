@@ -11,41 +11,37 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
 public class DoctorService {
 
     @Autowired
     DoctorRepo doctorRepo;
 
-    @Cacheable(value="Doctors")
-    public List<Doctor> getAllDoctors()
-    {
+    @Cacheable(value = "doctors")
+    public List<Doctor> getAllDoctors() {
         return doctorRepo.findAll();
     }
 
-    @Cacheable(value="Doctors",key="#specialization")
-    public List<Doctor> getDoctorsBySpecialization(String specialization)
-    {
+    @Cacheable(value = "doctors", key = "#specialization")
+    public List<Doctor> getDoctorsBySpecialization(String specialization) {
         return doctorRepo.findBySpecialization(specialization);
     }
 
-    public List<Doctor> getAvailableDoctors()
-    {
+    public List<Doctor> getAvailableDoctors() {
         return doctorRepo.findByStatus(DoctorStatus.AVAILABLE);
     }
 
-    public Doctor getDoctorById(String id)
-    {
+    public Doctor getDoctorById(String id) {
         return doctorRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found by Id"+id));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found by Id: " + id));
     }
 
-    @CachePut(value="Doctors",key = "#result.id")
+    @CacheEvict(value = "doctors", allEntries = true)
     public Doctor createDoctor(Doctor doctor) {
         return doctorRepo.save(doctor);
     }
-    @CachePut(value = "Doctors", key = "#result.id()")
+
+    @CacheEvict(value = "doctors", allEntries = true)
     public Doctor updateDoctor(String id, Doctor doctor) {
         if (!doctorRepo.existsById(id))
             throw new ResourceNotFoundException("Doctor not found with id: " + id);
@@ -53,11 +49,10 @@ public class DoctorService {
         return doctorRepo.save(doctor);
     }
 
-    @CacheEvict(value = "doctors", key = "#id")
+    @CacheEvict(value = "doctors", allEntries = true)
     public void deleteDoctor(String id) {
         if (!doctorRepo.existsById(id))
             throw new ResourceNotFoundException("Doctor not found with id: " + id);
         doctorRepo.deleteById(id);
     }
-
 }
