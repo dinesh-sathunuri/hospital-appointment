@@ -18,13 +18,13 @@ public class DoctorService {
     @Autowired
     DoctorRepo doctorRepo;
 
-    @Cacheable(value="doctors")
+    @Cacheable(value="Doctors")
     public List<Doctor> getAllDoctors()
     {
         return doctorRepo.findAll();
     }
 
-    @Cacheable(value="doctors",key="#specialization")
+    @Cacheable(value="Doctors",key="#specialization")
     public List<Doctor> getDoctorsBySpecialization(String specialization)
     {
         return doctorRepo.findBySpecialization(specialization);
