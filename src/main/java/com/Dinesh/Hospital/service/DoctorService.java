@@ -6,6 +6,7 @@ import com.Dinesh.Hospital.models.Doctor;
 import com.Dinesh.Hospital.repositories.DoctorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +41,11 @@ public class DoctorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found by Id"+id));
     }
 
-    @CacheEvict(value="Doctors",allEntries=true)
+    @CachePut(value="Doctors",key = "#result.id")
     public Doctor createDoctor(Doctor doctor) {
         return doctorRepo.save(doctor);
     }
-    @CacheEvict(value = "doctors", allEntries = true)
+    @CachePut(value = "Doctors", key = "#result.id()")
     public Doctor updateDoctor(String id, Doctor doctor) {
         if (!doctorRepo.existsById(id))
             throw new ResourceNotFoundException("Doctor not found with id: " + id);
@@ -52,7 +53,7 @@ public class DoctorService {
         return doctorRepo.save(doctor);
     }
 
-    @CacheEvict(value = "doctors", allEntries = true)
+    @CacheEvict(value = "doctors", key = "#id")
     public void deleteDoctor(String id) {
         if (!doctorRepo.existsById(id))
             throw new ResourceNotFoundException("Doctor not found with id: " + id);
